@@ -95,7 +95,7 @@ if __name__ == '__main__':
         plt.ylabel('abs(imag)')
         plt.xlabel('real')
 
-        fig.savefig('hydro_vars_vs_subs_nz{}_ra{}_k{}.png'.format(nzs[j], Ra, k), bbox_inches='tight', dpi=300)
+        fig.savefig('hydro_nz{}_ra{}_k{}.png'.format(nzs[j], Ra, k), bbox_inches='tight', dpi=300)
         plt.clf()
 
     # Fig 3 & 4 : Hires vs Lowres 
