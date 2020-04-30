@@ -75,6 +75,7 @@ if __name__ == '__main__':
         print('solve {} condition number: {:.2e}'.format(i, np.linalg.cond(solver.pencils[0].L_exp.A)))
         lamb = solver.eigenvalues
         lamb = lamb[np.argsort(lamb.real)]
+        lamb.imag[lamb.imag == 0] = 1e-16
         evalues.append(lamb)
 
     # Fig 1 & 2 : Variables vs subs (lowres & Hires)
