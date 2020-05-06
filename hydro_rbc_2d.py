@@ -45,12 +45,10 @@ def rbc_evp(Ra, k, Nz=24):
     problem.add_equation("dt(T) + w*dzT0   - inv_Pe_ff*Lap(T, Tz)          = -UdotGrad(T, Tz)")
 
     problem.add_equation("dt(u)  + dx(p)   + inv_Re_ff*Kx     = v*Oz - w*Oy")
-#    problem.add_equation("dt(v)  + dy(p)   + inv_Re_ff*Ky     = w*Ox - u*Oz")
     problem.add_equation("dt(w)  + dz(p)   + inv_Re_ff*Kz - T = u*Oy - v*Ox")
 
     problem.add_equation("dx(u)  + dy(v)  + dz(w)  = 0")
 
-#    problem.add_equation("Ox - (dy(w) - dz(v)) = 0")
     problem.add_equation("Oy - (dz(u) - dx(w)) = 0")
     problem.add_equation("Tz - dz(T) = 0")
 

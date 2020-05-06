@@ -9,7 +9,7 @@ import os
 
 comm = MPI.COMM_WORLD
 
-def mhd_rbc_evp(Q, Ra, k, Nz=24, variables_form=True):
+def mhd_rbc_evp(Q, Ra, k, Nz=24, variables_form=True, noHorizB_BCs=True):
     z = de.Chebyshev('z',Nz, interval=(0, 1))
     d = de.Domain([z],comm=MPI.COMM_SELF)
 
@@ -75,7 +75,12 @@ def mhd_rbc_evp(Q, Ra, k, Nz=24, variables_form=True):
     problem.add_equation("Oy - (dz(u) - dx(w)) = 0")
     problem.add_equation("Tz - dz(T) = 0")
 
-    bcs = ['T', 'u',  'v',  'w', 'Jx', 'Jy', 'Bz']
+    if noHorizB_BCs:
+        bcs = ['T', 'u',  'v',  'w', 'dz(Ax)', 'dz(Ay)', 'Az']
+    else:
+        #Waiting on Jeff
+        bcs = ['T', 'u',  'v',  'w', 'Ax', 'Ay', 'dz(Bx) - dx(By)']
+
     for bc in bcs:
         problem.add_bc(" left({}) = 0".format(bc))
         problem.add_bc("right({}) = 0".format(bc))
@@ -89,8 +94,8 @@ if __name__ == '__main__':
 
     problems = []
     for nz in nzs:
-        problems.append(mhd_rbc_evp(Q, Ra, k, Nz=nz, variables_form=True))
-        problems.append(mhd_rbc_evp(Q, Ra, k, Nz=nz, variables_form=False))
+        problems.append(mhd_rbc_evp(Q, Ra, k, Nz=nz, variables_form=True,  noHorizB_BCs=True))
+        problems.append(mhd_rbc_evp(Q, Ra, k, Nz=nz, variables_form=False, noHorizB_BCs=True))
 
     evalues = []
     for i, p in enumerate(problems):
@@ -98,6 +103,7 @@ if __name__ == '__main__':
         solver.solve_dense(solver.pencils[0], rebuild_coeffs=True)
         print('solve {} condition number: {:.2e}'.format(i, np.linalg.cond(solver.pencils[0].L_exp.A)))
         lamb = solver.eigenvalues
+        lamb.imag[lamb.imag == 0] = 1e-16
         evalues.append(lamb)
 
     # Fig 1 & 2 : Variables vs subs (lowres & Hires)
